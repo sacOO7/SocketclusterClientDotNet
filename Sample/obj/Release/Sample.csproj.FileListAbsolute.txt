@@ -1,0 +1,8 @@
+C:\Users\SAC\RiderProjects\Sample\Sample\bin\Release\Sample.exe
+C:\Users\SAC\RiderProjects\Sample\Sample\bin\Release\Sample.pdb
+C:\Users\SAC\RiderProjects\Sample\Sample\obj\Release\Sample.csprojResolveAssemblyReference.cache
+C:\Users\SAC\RiderProjects\Sample\Sample\obj\Release\Sample.exe
+C:\Users\SAC\RiderProjects\Sample\Sample\obj\Release\Sample.pdb
+C:\Users\SAC\RiderProjects\Sample\Sample\bin\Release\WebSocket4Net.dll
+C:\Users\SAC\RiderProjects\Sample\Sample\bin\Release\Newtonsoft.Json.dll
+C:\Users\SAC\RiderProjects\Sample\Sample\bin\Release\Newtonsoft.Json.xml
