@@ -47,6 +47,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Ack.cs" />
     <Compile Include="BasicListener.cs" />
     <Compile Include="Emitter.cs" />
     <Compile Include="Parser.cs" />
