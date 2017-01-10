@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Sample
+namespace ScClient
 {
     public class Parser
     {

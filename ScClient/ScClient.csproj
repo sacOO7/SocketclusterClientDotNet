@@ -4,12 +4,12 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{897E47DB-A2D6-4113-B576-617212F405C9}</ProjectGuid>
+    <ProjectGuid>{F6941EBC-68E7-4ABF-901F-AD06FCDB9500}</ProjectGuid>
     <ProjectTypeGuids>{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Sample</RootNamespace>
-    <AssemblyName>Sample</AssemblyName>
+    <RootNamespace>ScClient</RootNamespace>
+    <AssemblyName>ScClient</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -47,8 +47,14 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BasicListener.cs" />
+    <Compile Include="Emitter.cs" />
+    <Compile Include="Parser.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Proxy\HttpConnectProxy.cs" />
+    <Compile Include="Proxy\ProxyConnectorBase.cs" />
+    <Compile Include="Socket.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />

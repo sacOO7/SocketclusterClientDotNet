@@ -1,7 +1,6 @@
-﻿using System;
-using SuperSocket.ClientEngine;
+﻿using SuperSocket.ClientEngine;
 
-namespace Sample
+namespace ScClient
 {
 
     public interface BasicListener

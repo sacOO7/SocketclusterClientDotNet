@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Threading;
@@ -10,10 +8,8 @@ using Newtonsoft.Json.Linq;
 using Sample.Proxy;
 using SuperSocket.ClientEngine;
 using WebSocket4Net;
-using DataReceivedEventArgs = WebSocket4Net.DataReceivedEventArgs;
 
-
-namespace Sample
+namespace ScClient
 {
     public class Socket :Emitter
     {
