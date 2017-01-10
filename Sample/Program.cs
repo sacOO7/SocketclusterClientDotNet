@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using Newtonsoft.Json;
 using SuperSocket.ClientEngine;
-using WebSocket4Net;
 
 namespace Sample
 {
@@ -10,7 +7,17 @@ namespace Sample
     {
         public void onConnected(Socket socket)
         {
-             Console.WriteLine("connected got called");
+            Console.WriteLine("connected got called");
+
+            socket.emit("chat", "Hi", (name, error, data) =>
+            {
+                Console.WriteLine("data :: "+data+" error ::"+error);
+            });
+
+            socket.createChannel("yell").subscribe((name, error, data) =>
+            {
+                Console.WriteLine("Successfully scubscribed to channel "+name);
+            });
         }
 
         public void onDisconnected(Socket socket)
@@ -25,7 +32,7 @@ namespace Sample
 
         public void onAuthentication(Socket socket, bool status)
         {
-            Console.WriteLine("on authentication got called");
+            Console.WriteLine(status ? "Socket is authenticated" : "SOcket is not authenticated");
         }
 
         public void onSetAuthToken(string token, Socket socket)
@@ -42,18 +49,14 @@ namespace Sample
            var socket=new Socket("ws://localhost:8000/socketcluster/");
            socket.setListerner(new MyListener());
            socket.connect();
-           Console.ReadKey();
 
-//            var points = new Dictionary<string, object> {{"Hi", 1234}};
-//            points["hello"] = "asdff";
-//            points["data"]=new Dictionary<string, object> {{"Hi", 23543},{"total","dwd"}};
-//            var Json = JsonConvert.SerializeObject(points, Formatting.Indented);
-//            Console.WriteLine(Json);
+            socket.on("chat", (name, data, ack) =>
+            {
+                Console.WriteLine("got message "+ data+ " from event "+name);
+                ack(name, "No error", "Hi there buddy");
+            });
 
-
-
-
+            Console.ReadKey();
         }
-
     }
 }

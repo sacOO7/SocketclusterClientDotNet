@@ -9,7 +9,8 @@ namespace Sample
     public class Emitter
     {
         public delegate void Listener(string name,object data);
-        public delegate void AckListener(string name,object data,Ack ack);
+        public delegate void Ackcall(string name, object error, object data);
+        public delegate void AckListener(string name,object data,Ackcall ack);
 
 
         private Dictionary <string,Listener> singlecallbacks=new Dictionary<string, Listener>();
@@ -49,7 +50,7 @@ namespace Sample
 
         public Emitter handleEmit(string Event, object Object)
         {
-            if (singleackcallbacks.ContainsKey(Event))
+            if (singlecallbacks.ContainsKey(Event))
             {
                 Listener listener = singlecallbacks[Event];
                 listener(Event, Object);
@@ -73,7 +74,7 @@ namespace Sample
             return singleackcallbacks.ContainsKey(Event);
         }
 
-        public Emitter handleEmitAck(string Event, object Object , Ack ack){
+        public Emitter handleEmitAck(string Event, object Object , Ackcall ack){
 
             if (singleackcallbacks.ContainsKey(Event))
             {
