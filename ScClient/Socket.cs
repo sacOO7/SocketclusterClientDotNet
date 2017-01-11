@@ -240,17 +240,17 @@ namespace ScClient
         public Socket emit(string Event, object Object)
         {
 //            Console.WriteLine("Emit got called");
-            Dictionary<string,object> eventObject=new Dictionary<string, object>{{"event",Event},{"data",Object}};
-            var json = JsonConvert.SerializeObject(eventObject, Formatting.Indented);
-            _socket.Send(json);
+                Dictionary<string,object> eventObject=new Dictionary<string, object>{{"event",Event},{"data",Object}};
+                var json = JsonConvert.SerializeObject(eventObject, Formatting.Indented);
+                _socket.Send(json);
             return this;
         }
 
         public Socket emit(string Event, object Object, Ackcall ack)
         {
-
-            Dictionary<string,object> eventObject=new Dictionary<string, object>{{"event",Event},{"data",Object},{"cid",Interlocked.Increment(ref counter)}};
-            acks.Add(counter,getAckObject(Event,ack));
+            long count = Interlocked.Increment(ref counter);
+            Dictionary<string,object> eventObject=new Dictionary<string, object>{{"event",Event},{"data",Object},{"cid",count}};
+            acks.Add(count,getAckObject(Event,ack));
             var json = JsonConvert.SerializeObject(eventObject, Formatting.Indented);
             _socket.Send(json);
             return this;
@@ -267,8 +267,9 @@ namespace ScClient
 
         public Socket subscribe(string Channel,Ackcall ack)
         {
-            Dictionary<string,object> subscribeObject=new Dictionary<string, object>{{"event","#subscribe"},{"data",new Dictionary<string,string>(){{"channel",Channel}}},{"cid",Interlocked.Increment(ref counter)}};
-            acks.Add(counter, getAckObject(Channel, ack));
+            long count = Interlocked.Increment(ref counter);
+            Dictionary<string,object> subscribeObject=new Dictionary<string, object>{{"event","#subscribe"},{"data",new Dictionary<string,string>(){{"channel",Channel}}},{"cid",count}};
+            acks.Add(count, getAckObject(Channel, ack));
             var json = JsonConvert.SerializeObject(subscribeObject, Formatting.Indented);
             _socket.Send(json);
             return this;
@@ -284,9 +285,9 @@ namespace ScClient
 
         public Socket unsubscribe(string Channel,Ackcall ack)
         {
-
-            Dictionary<string,object> subscribeObject=new Dictionary<string, object>{{"event","#unsubscribe"},{"data",Channel},{"cid",Interlocked.Increment(ref counter)}};
-            acks.Add(counter, getAckObject(Channel, ack));
+            long count = Interlocked.Increment(ref counter);
+            Dictionary<string,object> subscribeObject=new Dictionary<string, object>{{"event","#unsubscribe"},{"data",Channel},{"cid",count}};
+            acks.Add(count, getAckObject(Channel, ack));
             var json = JsonConvert.SerializeObject(subscribeObject, Formatting.Indented);
             _socket.Send(json);
            return this;
@@ -303,9 +304,9 @@ namespace ScClient
 
         public Socket publish(string Channel, object data, Ackcall ack)
         {
-
-            Dictionary<string,object> publishObject=new Dictionary<string, object>{{"event","#publish"},{"data",new Dictionary<string,object>{{"channel",Channel},{"data",data}}},{"cid",Interlocked.Increment(ref counter)}};
-            acks.Add(counter, getAckObject(Channel, ack));
+            long count = Interlocked.Increment(ref counter);
+            Dictionary<string,object> publishObject=new Dictionary<string, object>{{"event","#publish"},{"data",new Dictionary<string,object>{{"channel",Channel},{"data",data}}},{"cid",count}};
+            acks.Add(count, getAckObject(Channel, ack));
             var json = JsonConvert.SerializeObject(publishObject, Formatting.Indented);
             _socket.Send(json);
             return this;
