@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Resources;
 using System.Threading;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -15,10 +16,11 @@ namespace ScClient
     {
         public WebSocket _socket;
         private string URL;
-        private string id;
+        public string id;
         private long counter;
         private string AuthToken;
         List<Channel> channels;
+        private ReconnectStrategy Strategy;
         private Dictionary<long?, object[]> acks;
         private BasicListener _listener;
 
@@ -27,6 +29,7 @@ namespace ScClient
 
             _socket = new WebSocket(URL);
             counter = 0;
+            Strategy = null;
             channels = new List<Channel>();
             acks=new Dictionary<long?, object[]>();
 
@@ -36,10 +39,12 @@ namespace ScClient
             _socket.Closed += new EventHandler(websocket_Closed);
             _socket.MessageReceived += new EventHandler<MessageReceivedEventArgs>(websocket_MessageReceived);
             _socket.DataReceived +=new EventHandler<DataReceivedEventArgs>(websocket_DataReceived);
-
-
         }
 
+        public void setReconnectStrategy(ReconnectStrategy strategy)
+        {
+            Strategy = strategy;
+        }
         public void setProxy(string host, int port)
         {
             var proxy = new HttpConnectProxy(new IPEndPoint(IPAddress.Parse(host), port));
@@ -71,6 +76,7 @@ namespace ScClient
 
         private void subscribeChannels()
         {
+
             foreach (var channel in channels)
             {
                 channel.subscribe();
@@ -89,6 +95,10 @@ namespace ScClient
         {
 
             counter = 0;
+            if (Strategy != null)
+            {
+                Strategy.setAttemptsMade(0);
+            }
             var authobject=new Dictionary<string, object> {{"event", "#handshake"},{"data",new Dictionary<string,object>{{"authToken",AuthToken}}},{"cid",Interlocked.Increment(ref counter)}};
             var json = JsonConvert.SerializeObject(authobject, Formatting.Indented);
 
@@ -97,17 +107,19 @@ namespace ScClient
             _listener.onConnected(this);
 
         }
+
         private void websocket_Error(object sender, ErrorEventArgs e)
         {
-
             _listener.onConnectError(this,e);
-
         }
+
         private void websocket_Closed(object sender, EventArgs e)
         {
-
             _listener.onDisconnected(this);
-
+            if (!Strategy.areAttemptsComplete())
+            {
+                new Thread(reconnect).Start();
+            }
         }
         private void websocket_MessageReceived(object sender, MessageReceivedEventArgs e)
         {
@@ -118,7 +130,6 @@ namespace ScClient
             else
             {
 //                Console.WriteLine("Message received :: "+e.Message);
-
 
                 var dict = JsonConvert.DeserializeObject<Dictionary<string, object>>(e.Message);
 
@@ -203,6 +214,18 @@ namespace ScClient
             _socket.Open();
         }
 
+        private void reconnect()
+        {
+            Strategy.processValues();
+            Thread.Sleep(Strategy.getReconnectInterval());
+            connect();
+        }
+
+        public void disconnect()
+        {
+            _socket.Close();
+        }
+
         private Ackcall ack(long? cid)
         {
             return (name, error, data) =>
@@ -216,6 +239,7 @@ namespace ScClient
 
         public Socket emit(string Event, object Object)
         {
+//            Console.WriteLine("Emit got called");
             Dictionary<string,object> eventObject=new Dictionary<string, object>{{"event",Event},{"data",Object}};
             var json = JsonConvert.SerializeObject(eventObject, Formatting.Indented);
             _socket.Send(json);
@@ -237,15 +261,12 @@ namespace ScClient
 
             Dictionary<string,object> subscribeObject=new Dictionary<string, object>{{"event","#subscribe"},{"data",new Dictionary<string,string>{{"channel",Channel}}},{"cid",Interlocked.Increment(ref counter)}};
             var json = JsonConvert.SerializeObject(subscribeObject, Formatting.Indented);
-
             _socket.Send(json);
             return this;
         }
 
         public Socket subscribe(string Channel,Ackcall ack)
         {
-
-
             Dictionary<string,object> subscribeObject=new Dictionary<string, object>{{"event","#subscribe"},{"data",new Dictionary<string,string>(){{"channel",Channel}}},{"cid",Interlocked.Increment(ref counter)}};
             acks.Add(counter, getAckObject(Channel, ack));
             var json = JsonConvert.SerializeObject(subscribeObject, Formatting.Indented);

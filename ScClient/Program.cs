@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using SuperSocket.ClientEngine;
 
 
@@ -9,16 +10,14 @@ namespace ScClient
         public void onConnected(Socket socket)
         {
             Console.WriteLine("connected got called");
-
-            socket.emit("chat", "Hi", (name, error, data) =>
+            new Thread(() =>
             {
-                Console.WriteLine("data :: "+data+" error ::"+error);
-            });
+                Thread.Sleep(2000);
+                socket.emit("chat", "Hi sachin");
+                socket.getChannelByName("yell").publish("Hi there,How are you");
 
-            socket.createChannel("yell").subscribe((name, error, data) =>
-            {
-                Console.WriteLine("Successfully scubscribed to channel "+name);
-            });
+            }).Start();
+
         }
 
         public void onDisconnected(Socket socket)
@@ -33,11 +32,12 @@ namespace ScClient
 
         public void onAuthentication(Socket socket, bool status)
         {
-            Console.WriteLine(status ? "Socket is authenticated" : "SOcket is not authenticated");
+            Console.WriteLine(status ? "Socket is authenticated" : "Socket is not authenticated");
         }
 
         public void onSetAuthToken(string token, Socket socket)
         {
+            socket.setAuthToken(token);
             Console.WriteLine("on set auth token got called");
         }
 
@@ -51,6 +51,7 @@ namespace ScClient
         {
             var socket=new Socket("ws://localhost:8000/socketcluster/");
             socket.setListerner(new MyListener());
+            socket.setReconnectStrategy(new ReconnectStrategy().setMaxAttempts(10));
             socket.connect();
 
             socket.on("chat", (name, data, ack) =>
@@ -59,7 +60,26 @@ namespace ScClient
                 ack(name, "No error", "Hi there buddy");
             });
 
+            new Thread(() =>
+            {
+                Thread.Sleep(1000);
+                socket.createChannel("yell").subscribe();
+
+            }).Start();
+
+            socket.on("yell",(name, data, ack) =>
+            {
+                Console.WriteLine("event :"+name+" data:"+data);
+                ack(name, " yell error ", " This is sample data ");
+            });
+
+            socket.onSubscribe("yell", (name, data) =>
+            {
+                Console.WriteLine("Got data for channel:: "+name+ " data :: "+data);
+            });
+
             Console.ReadKey();
+
         }
     }
 }

@@ -1,5 +1,0 @@
-C:\Users\SAC\RiderProjects\Sample\Sample\bin\Debug\Sample.exe
-C:\Users\SAC\RiderProjects\Sample\Sample\bin\Debug\Sample.pdb
-C:\Users\SAC\RiderProjects\Sample\Sample\obj\Debug\Sample.csprojResolveAssemblyReference.cache
-C:\Users\SAC\RiderProjects\Sample\Sample\obj\Debug\Sample.exe
-C:\Users\SAC\RiderProjects\Sample\Sample\obj\Debug\Sample.pdb
