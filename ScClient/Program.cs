@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using SuperSocket.ClientEngine;
 
@@ -13,8 +14,11 @@ namespace ScClient
             new Thread(() =>
             {
                 Thread.Sleep(2000);
-                socket.emit("chat", "Hi sachin");
-                socket.getChannelByName("yell").publish("Hi there,How are you");
+                socket.emit("chat", "Hi sachin", (evemtname, error, data) =>
+                {
+
+                });
+                socket.getChannelByName("yell").publish("Hi there,How are you")
 
             }).Start();
 
@@ -73,10 +77,13 @@ namespace ScClient
                 ack(name, " yell error ", " This is sample data ");
             });
 
+
             socket.onSubscribe("yell", (name, data) =>
             {
                 Console.WriteLine("Got data for channel:: "+name+ " data :: "+data);
             });
+
+
 
             Console.ReadKey();
 
