@@ -36,7 +36,7 @@ Create instance of `Socket` class by passing url of socketcluster-server end-poi
 
 ```C#
     //Create a socket instance
-    String url="ws://localhost:8000/socketcluster/";
+    string url="ws://localhost:8000/socketcluster/";
     var socket=new Socket(url);
 
 ```
