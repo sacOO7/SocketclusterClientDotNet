@@ -287,10 +287,11 @@ socket.setSSLCertVerification(true/false);
 
 #### Setting HTTP proxy with server
 
-//args, string : host , int : port
+
 
 ```C#
 
+//args, string : host , int : port
 socket.setProxy(host,port);
 
 ```
