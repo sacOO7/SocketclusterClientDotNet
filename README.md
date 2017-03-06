@@ -20,6 +20,7 @@ Client supports following platforms
 - WindowsPhone
 - Xamarin.Android
 - Xamarin.iOS
+- Unity
 
 License
 -------
