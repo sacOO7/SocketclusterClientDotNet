@@ -296,3 +296,5 @@ socket.setSSLCertVerification(true/false);
 socket.setProxy(host,port);
 
 ```
+
+#### Star the repo. if you love the client :).
