@@ -26,9 +26,19 @@ License
 -------
 Apache License, Version 2.0
 
-Nuget
+Usage via Nuget
 ------
-Yet to be uploaded. Library is built on top of Websocket4Net and Newtonsoft.Json. Install those packages via nuget and add source
+```
+    Install-Package ScClient
+```
+
+Nuget Gallery link : https://www.nuget.org/packages/ScClient/1.0.0
+
+<!--Yet to be uploaded. -->
+
+Usage using source files
+------
+Library is built on top of Websocket4Net and Newtonsoft.Json. Install those packages via nuget and add source
 files into project
 
 Description
