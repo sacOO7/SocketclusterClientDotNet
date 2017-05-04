@@ -123,7 +123,7 @@ namespace ScClient
         }
         private void websocket_MessageReceived(object sender, MessageReceivedEventArgs e)
         {
-            if (e.Message == "#1")
+            if (e.Message.Contains("1") && !e.Message.Contains("data"))
             {
                 _socket.Send("#2");
             }
