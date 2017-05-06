@@ -18,7 +18,7 @@ namespace ScClient
                 {
 
                 });
-                socket.getChannelByName("yell").publish("Hi there,How are you")
+                socket.getChannelByName("yell").publish("Hi there,How are you");
 
             }).Start();
 
