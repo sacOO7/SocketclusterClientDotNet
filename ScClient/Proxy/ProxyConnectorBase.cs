@@ -11,7 +11,7 @@ namespace Sample.Proxy
     {
         public EndPoint ProxyEndPoint { get; private set; }
 
-        protected static Encoding ASCIIEncoding = new ASCIIEncoding();
+        protected static Encoding ASCIIEncoding = new System.Text.ASCIIEncoding();
 
 #if SILVERLIGHT && !WINDOWS_PHONE
         protected SocketClientAccessPolicyProtocol ClientAccessPolicyProtocol { get; private set; }
