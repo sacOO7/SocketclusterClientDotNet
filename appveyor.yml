@@ -20,7 +20,15 @@ before_build:
 configuration: Release
 platform: Any CPU
 
+nuget:
+  project_feed: true
+
 build:
   parallel: true
   project: ScClient.sln
   verbosity: minimal
+      
+after_build:
+  - ps: nuget pack ScClient.nuspec -Version $env:APPVEYOR_BUILD_VERSION
+artifacts:
+  - path: '**\ScClient.*.nupkg'
