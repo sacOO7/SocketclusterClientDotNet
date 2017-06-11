@@ -1,0 +1,26 @@
+branches:
+  only:
+    - master
+
+version: 1.0.{build}-ci
+assembly_info:
+  patch: true
+  file: '**\AssemblyInfo.*'
+  assembly_version: '{version}'
+  assembly_file_version: '{version}'
+  assembly_informational_version: '{version}'
+
+os: Visual Studio 2015
+install:
+  - set PATH=C:\Program Files (x86)\MSBuild\14.0\Bin;%PATH%
+
+before_build:
+  nuget restore "ScClient.sln"
+
+configuration: Release
+platform: Any CPU
+
+build:
+  parallel: true
+  project: ScClient.sln
+  verbosity: minimal
