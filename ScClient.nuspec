@@ -28,7 +28,7 @@ Client supports following platforms
     <copyright>Copyright ©  2017</copyright>
     <dependencies>
       <dependency id="Newtonsoft.Json" version="10.0.2" />
-      <dependency id="ScClient" version="0.14.1" />
+      <dependency id="WebSocket4Net" version="0.14.1" />
     </dependencies>
     <projectUrl>https://github.com/sacOO7/SocketclusterClientDotNet</projectUrl>
     <releaseNotes>First Nuget Package</releaseNotes>
