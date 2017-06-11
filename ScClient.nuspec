@@ -27,7 +27,7 @@ Client supports following platforms
  • Unity (not tested yet)</description>
     <copyright>Copyright ©  2017</copyright>
     <dependencies>
-      <dependency id="Newtonsoft.Json" version="10.0.2" />
+      <dependency id="Newtonsoft.Json" version="9.0.1" />
       <dependency id="WebSocket4Net" version="0.14.1" />
     </dependencies>
     <projectUrl>https://github.com/sacOO7/SocketclusterClientDotNet</projectUrl>
