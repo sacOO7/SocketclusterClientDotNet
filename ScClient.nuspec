@@ -1,0 +1,54 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>ScClient</id>
+    <version>1.0.0</version>
+    <title>Socketcluster .Net Client</title>
+    <authors>Alexander Klus, Sachin Shinde</authors>
+    <owners>Alexander</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>This client provides following functionality
+
+ • Support for emitting and listening to remote events
+ • Automatic reconnection
+ • Pub/sub
+ • Authentication (JWT)
+
+Client supports following platforms
+
+ • .Net 2.0
+ • .Net 3.5
+ • .Net 4.0
+ • Mono
+ • Silverlight
+ • WindowsPhone
+ • Xamarin.Android
+ • Xamarin.iOS
+ • Unity (not tested yet)</description>
+    <copyright>Copyright ©  2017</copyright>
+    <dependencies>
+      <dependency id="Newtonsoft.Json" version="10.0.2" />
+      <dependency id="ScClient" version="0.14.1" />
+    </dependencies>
+    <projectUrl>https://github.com/sacOO7/SocketclusterClientDotNet</projectUrl>
+    <releaseNotes>First Nuget Package</releaseNotes>
+    <summary>C# client for the Socketcluster framework build in Node.JS</summary>
+    <tags>socketcluster websockets client</tags>
+	<references>	  
+	  <reference file="ScClient.dll" />
+	</references>
+  </metadata>
+  <files>
+    <!--<file src="bin\net20\release\ScClient.dll" target="lib/net20" />-->
+	<!--<file src="bin\net35\release\ScClient.dll" target="lib/net35" />-->
+	<!--<file src="bin\net40\release\ScClient.dll" target="lib/net40" />-->
+	<file src="ScClient\bin\Release\ScClient.dll" target="lib/net45" />
+	<!--<file src="bin\sl50\release\ScClient.dll" target="lib/sl50" />-->
+	<!--<file src="bin\wp80\release\ScClient.dll" target="lib/wp80" />-->
+	<!--<file src="bin\win\release\ScClient.dll" target="lib/win" />-->
+	<file src="ScClient.Xamarin.Droid\bin\Release\ScClient.dll" target="lib/monoandroid10" />
+	<!--<file src="bin\monotouch10\release\ScClient.dll" target="lib/monotouch10" />-->
+	<file src="ScClient.Xamarin.iOS\bin\Release\ScClient.dll" target="lib/xamarinios10" />
+	<!--<file src="bin\netstandard1.3\release\ScClient.dll" target="lib/netstandard1.3" />-->
+  </files>
+</package>
