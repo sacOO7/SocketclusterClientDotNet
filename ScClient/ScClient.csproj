@@ -3,21 +3,22 @@
   <PropertyGroup>
     <TargetFrameworks>netcoreapp1.0;netcoreapp1.1;netcoreapp2.0;netstandard1.3;netstandard1.6;netstandard2.0;net45;net46;net40</TargetFrameworks>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-    <Authors>Sachin Shinde</Authors>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <Authors>Sachin Shinde (https://github.com/sacOO7/)</Authors>
     <RepositoryUrl>https://github.com/sacOO7/SocketclusterClientDotNet</RepositoryUrl>
     <RepositoryType>Dotnet</RepositoryType>
     <PackageReleaseNotes>Build target defined for dotnetcore, dotnet4.* and dotnetstandard</PackageReleaseNotes>
-    <Description>.Net Socketcluster Client
-This client provides following functionality
-1. Support for emitting and listening to remote events
-2. Automatic reconnection
-3. Pub-sub
-4. Authentication (JWT)</Description>
+    <Description>C# client implementation for socketcluster framework in node.js</Description>
     <PackageProjectUrl>https://github.com/sacOO7/SocketclusterClientDotNet</PackageProjectUrl>
     <PackageIconUrl>https://socketcluster.io/assets/img/logo.png</PackageIconUrl>
-    <Company>Socketcluster</Company>
-    <Product>ScClient (Official)</Product>
+    <Company>Socketcluster (https://socketcluster.io/#!/)</Company>
+    <Product>Socketcluster Client DotNet</Product>
+    <Version>1.1.0</Version>
+    <PackageId>ScClient.Official</PackageId>
+    <PackageLicenseUrl>https://github.com/sacOO7/SocketclusterClientDotNet/blob/master/LICENSE.txt</PackageLicenseUrl>
+    <Copyright>https://github.com/sacOO7/SocketclusterClientDotNet/blob/master/LICENSE.txt</Copyright>
+    <PackageTags>websocket client socketcluster DotNet</PackageTags>
+    <title>Socketcluster Client DotNet (Official)</title>
    </PropertyGroup>
 
   <ItemGroup>
