@@ -6,87 +6,71 @@ using SuperSocket.ClientEngine;
 
 namespace ScClient
 {
-    internal class MyListener:BasicListener
+    internal class Program : IBasicListener
     {
-        public void onConnected(Socket socket)
+        public void OnConnected(Socket socket)
         {
             Console.WriteLine("connected got called");
             new Thread(() =>
             {
                 Thread.Sleep(2000);
-                socket.emit("chat", "Hi sachin", (evemtname, error, data) =>
-                {
-
-                });
-                socket.getChannelByName("yell").publish("Hi there,How are you")
-
+                socket.Emit("chat", "Hi sachin", (evemtname, error, data) => { });
+                socket.GetChannelByName("yell").Publish("Hi there,How are you");
             }).Start();
-
         }
 
-        public void onDisconnected(Socket socket)
+        public void OnDisconnected(Socket socket)
         {
             Console.WriteLine("disconnected got called");
         }
 
-        public void onConnectError(Socket socket, ErrorEventArgs e)
+        public void OnConnectError(Socket socket, ErrorEventArgs e)
         {
             Console.WriteLine("on connect error got called");
         }
 
-        public void onAuthentication(Socket socket, bool status)
+        public void OnAuthentication(Socket socket, bool status)
         {
             Console.WriteLine(status ? "Socket is authenticated" : "Socket is not authenticated");
         }
 
-        public void onSetAuthToken(string token, Socket socket)
+        public void OnSetAuthToken(string token, Socket socket)
         {
-            socket.setAuthToken(token);
+            socket.SetAuthToken(token);
             Console.WriteLine("on set auth token got called");
         }
 
-
-    }
-
-    internal class Program
-    {
-
         public static void Main(string[] args)
         {
-            var socket=new Socket("ws://localhost:8000/socketcluster/");
-            socket.setListerner(new MyListener());
-            socket.setReconnectStrategy(new ReconnectStrategy().setMaxAttempts(10));
-            socket.connect();
+            var socket = new Socket("ws://localhost:8000/socketcluster/");
+            socket.SetListerner(new Program());
+            socket.SetReconnectStrategy(new ReconnectStrategy().SetMaxAttempts(10));
+            socket.Connect();
 
-            socket.on("chat", (name, data, ack) =>
+            socket.On("chat", (name, data, ack) =>
             {
-                Console.WriteLine("got message "+ data+ " from event "+name);
+                Console.WriteLine("got message " + data + " from event " + name);
                 ack(name, "No error", "Hi there buddy");
             });
 
             new Thread(() =>
             {
                 Thread.Sleep(1000);
-                socket.createChannel("yell").subscribe();
-
+                socket.CreateChannel("yell").Subscribe();
             }).Start();
 
-            socket.on("yell",(name, data, ack) =>
+            socket.On("yell", (name, data, ack) =>
             {
-                Console.WriteLine("event :"+name+" data:"+data);
+                Console.WriteLine("event :" + name + " data:" + data);
                 ack(name, " yell error ", " This is sample data ");
             });
 
 
-            socket.onSubscribe("yell", (name, data) =>
-            {
-                Console.WriteLine("Got data for channel:: "+name+ " data :: "+data);
-            });
-
+            socket.OnSubscribe("yell",
+                (name, data) => { Console.WriteLine("Got data for channel:: " + name + " data :: " + data); });
 
 
             Console.ReadKey();
-
         }
     }
 }

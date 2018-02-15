@@ -2,14 +2,12 @@
 
 namespace ScClient
 {
-
-    public interface BasicListener
+    public interface IBasicListener
     {
-        void onConnected(Socket socket);
-        void onDisconnected(Socket socket);
-        void onConnectError(Socket socket,ErrorEventArgs e);
-        void onAuthentication(Socket socket, bool status);
-        void onSetAuthToken(string token, Socket socket);
-
+        void OnConnected(Socket socket);
+        void OnDisconnected(Socket socket);
+        void OnConnectError(Socket socket, ErrorEventArgs e);
+        void OnAuthentication(Socket socket, bool status);
+        void OnSetAuthToken(string token, Socket socket);
     }
 }

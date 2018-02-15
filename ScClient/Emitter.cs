@@ -1,86 +1,90 @@
-﻿
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace ScClient
 {
     public class Emitter
     {
-        public delegate void Listener(string name,object data);
+        public delegate void Listener(string name, object data);
+
         public delegate void Ackcall(string name, object error, object data);
-        public delegate void AckListener(string name,object data,Ackcall ack);
+
+        public delegate void AckListener(string name, object data, Ackcall ack);
 
 
-        private Dictionary <string,Listener> singlecallbacks=new Dictionary<string, Listener>();
-        private Dictionary<string,AckListener> singleackcallbacks=new Dictionary<string, AckListener>();
-        private Dictionary<string,Listener> publishcallbacks=new Dictionary<string, Listener>();
+        private readonly Dictionary<string, Listener> _singlecallbacks = new Dictionary<string, Listener>();
+        private readonly Dictionary<string, AckListener> _singleackcallbacks = new Dictionary<string, AckListener>();
+        private readonly Dictionary<string, Listener> _publishcallbacks = new Dictionary<string, Listener>();
 
-        public Emitter on(string Event, Listener fn)
+        public Emitter On(string Event, Listener fn)
         {
-            if (singlecallbacks.ContainsKey(Event))
+            if (_singlecallbacks.ContainsKey(Event))
             {
-                singlecallbacks.Remove(Event);
+                _singlecallbacks.Remove(Event);
             }
 
-            singlecallbacks.Add(Event,fn);
+            _singlecallbacks.Add(Event, fn);
 
             return this;
         }
 
-        public Emitter onSubscribe(string Event,Listener fn){
-
-            if (publishcallbacks.ContainsKey(Event)){
-                publishcallbacks.Remove(Event);
+        public Emitter OnSubscribe(string Event, Listener fn)
+        {
+            if (_publishcallbacks.ContainsKey(Event))
+            {
+                _publishcallbacks.Remove(Event);
             }
-            publishcallbacks.Add(Event, fn);
+
+            _publishcallbacks.Add(Event, fn);
             return this;
         }
 
-        public Emitter on(string Event, AckListener fn)
+        public Emitter On(string Event, AckListener fn)
         {
-            if (singleackcallbacks.ContainsKey(Event))
+            if (_singleackcallbacks.ContainsKey(Event))
             {
-                singleackcallbacks.Remove(Event);
+                _singleackcallbacks.Remove(Event);
             }
-            singleackcallbacks.Add(Event,fn);
+
+            _singleackcallbacks.Add(Event, fn);
             return this;
         }
 
-        public Emitter handleEmit(string Event, object Object)
+        public Emitter HandleEmit(string Event, object Object)
         {
-            if (singlecallbacks.ContainsKey(Event))
+            if (_singlecallbacks.ContainsKey(Event))
             {
-                Listener listener = singlecallbacks[Event];
+                Listener listener = _singlecallbacks[Event];
                 listener(Event, Object);
             }
+
             return this;
         }
 
-        public Emitter handlePublish(string Event, object Object){
-
-
-            if (publishcallbacks.ContainsKey(Event))
-            {
-                Listener listener = publishcallbacks[Event];
-                listener(Event,Object);
-            }
-            return this;
-        }
-
-        public bool hasEventAck(string Event)
+        public Emitter HandlePublish(string Event, object Object)
         {
-            return singleackcallbacks.ContainsKey(Event);
-        }
-
-        public Emitter handleEmitAck(string Event, object Object , Ackcall ack){
-
-            if (singleackcallbacks.ContainsKey(Event))
+            if (_publishcallbacks.ContainsKey(Event))
             {
-                AckListener listener = singleackcallbacks[Event];
-                listener(Event,Object,ack);
+                Listener listener = _publishcallbacks[Event];
+                listener(Event, Object);
             }
+
             return this;
         }
 
+        public bool HasEventAck(string Event)
+        {
+            return _singleackcallbacks.ContainsKey(Event);
+        }
 
+        public Emitter HandleEmitAck(string Event, object Object, Ackcall ack)
+        {
+            if (_singleackcallbacks.ContainsKey(Event))
+            {
+                AckListener listener = _singleackcallbacks[Event];
+                listener(Event, Object, ack);
+            }
+
+            return this;
+        }
     }
 }

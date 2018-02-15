@@ -6,31 +6,28 @@ namespace ScClient
     {
         public enum ParseResult
         {
-            ISAUTHENTICATED,
-            PUBLISH,
-            REMOVETOKEN,
-            SETTOKEN,
-            EVENT,
-            ACKRECEIVE
+            Isauthenticated,
+            Publish,
+            Removetoken,
+            Settoken,
+            Event,
+            Ackreceive
         }
 
-        public static ParseResult parse(object dataobject,long? rid,long? cid,string Event)
+        public static ParseResult Parse(object dataobject, long? rid, long? cid, string Event)
         {
-            if (Event == null) return rid == 1 ? ParseResult.ISAUTHENTICATED : ParseResult.ACKRECEIVE;
+            if (Event == null) return rid == 1 ? ParseResult.Isauthenticated : ParseResult.Ackreceive;
             switch (Event)
             {
                 case "#publish":
-                    return ParseResult.PUBLISH;
+                    return ParseResult.Publish;
                 case "#removeAuthToken":
-                    return ParseResult.REMOVETOKEN;
+                    return ParseResult.Removetoken;
                 case "#setAuthToken":
-                    return ParseResult.SETTOKEN;
+                    return ParseResult.Settoken;
                 default:
-                    return ParseResult.EVENT;
+                    return ParseResult.Event;
             }
-
         }
-
-
     }
 }

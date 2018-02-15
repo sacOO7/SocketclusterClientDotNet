@@ -1,8 +1,0 @@
-C:\Users\SAC\RiderProjects\Sample\ScClient\bin\Release\ScClient.exe
-C:\Users\SAC\RiderProjects\Sample\ScClient\bin\Release\ScClient.pdb
-C:\Users\SAC\RiderProjects\Sample\ScClient\bin\Release\Newtonsoft.Json.dll
-C:\Users\SAC\RiderProjects\Sample\ScClient\bin\Release\WebSocket4Net.dll
-C:\Users\SAC\RiderProjects\Sample\ScClient\bin\Release\Newtonsoft.Json.xml
-C:\Users\SAC\RiderProjects\Sample\ScClient\obj\Release\ScClient.csprojResolveAssemblyReference.cache
-C:\Users\SAC\RiderProjects\Sample\ScClient\obj\Release\ScClient.exe
-C:\Users\SAC\RiderProjects\Sample\ScClient\obj\Release\ScClient.pdb

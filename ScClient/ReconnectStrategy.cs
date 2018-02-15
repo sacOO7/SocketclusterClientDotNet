@@ -7,71 +7,79 @@
      * Default: 2000
      */
 
-        int reconnectInterval;
+        private int _reconnectInterval;
 
         /**
          * The maximum number of milliseconds to delay a reconnection attempt.
          * Default: 30000
          */
 
-        int maxReconnectInterval;
+        int _maxReconnectInterval;
 
         /**
      * The maximum number of reconnection attempts that will be made before giving up. If null, reconnection attempts will be continue to be made forever.
      * Default: null
      */
 
-        int? maxAttempts;
+        int? _maxAttempts;
 
-        int attmptsMade;
+        int _attmptsMade;
 
-        public ReconnectStrategy(){
-            reconnectInterval=3000;
-            maxReconnectInterval=30000;
-            maxAttempts=null;  //forever
-            attmptsMade=0;
+        public ReconnectStrategy()
+        {
+            _reconnectInterval = 3000;
+            _maxReconnectInterval = 30000;
+            _maxAttempts = null; //forever
+            _attmptsMade = 0;
         }
 
-        public ReconnectStrategy setMaxAttempts(int attempts)
+        public ReconnectStrategy SetMaxAttempts(int attempts)
         {
-            maxAttempts = attempts;
+            _maxAttempts = attempts;
             return this;
         }
 
         public void Reset()
         {
-            attmptsMade = 0;
-            reconnectInterval=3000;
-            maxAttempts=null;
+            _attmptsMade = 0;
+            _reconnectInterval = 3000;
+            _maxAttempts = null;
         }
 
-        public void setAttemptsMade(int count)
+        public void SetAttemptsMade(int count)
         {
-            attmptsMade = count;
+            _attmptsMade = count;
         }
 
-        public ReconnectStrategy(int reconnectInterval, int maxReconnectInterval, int maxAttempts) {
-            if (reconnectInterval>maxReconnectInterval) {
-                this.reconnectInterval = maxReconnectInterval;
-            }else {
-                this.reconnectInterval=reconnectInterval;
+        public ReconnectStrategy(int reconnectInterval, int maxReconnectInterval, int maxAttempts)
+        {
+            if (reconnectInterval > maxReconnectInterval)
+            {
+                this._reconnectInterval = maxReconnectInterval;
             }
-            this.maxReconnectInterval = maxReconnectInterval;
-            this.maxAttempts = maxAttempts;
-            attmptsMade=0;
+            else
+            {
+                this._reconnectInterval = reconnectInterval;
+            }
+
+            this._maxReconnectInterval = maxReconnectInterval;
+            this._maxAttempts = maxAttempts;
+            _attmptsMade = 0;
         }
 
-        public void processValues()
+        public void ProcessValues()
         {
-            attmptsMade++;
+            _attmptsMade++;
         }
 
-        public int getReconnectInterval(){
-            return reconnectInterval;
+        public int GetReconnectInterval()
+        {
+            return _reconnectInterval;
         }
 
-        public bool areAttemptsComplete(){
-            return attmptsMade==maxAttempts;
+        public bool AreAttemptsComplete()
+        {
+            return _attmptsMade == _maxAttempts;
         }
     }
 }
