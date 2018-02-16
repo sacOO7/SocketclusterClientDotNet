@@ -145,26 +145,26 @@ namespace ScClient
 
                 switch (Parser.Parse(dataobject, rid, cid, Event))
                 {
-                    case Parser.ParseResult.Isauthenticated:
+                    case Parser.MessageType.Isauthenticated:
 //                        Console.WriteLine("IS authenticated got called");
                         id = (string) ((JObject) dataobject).GetValue("id");
                         _listener.OnAuthentication(this, (bool) ((JObject) dataobject).GetValue("isAuthenticated"));
                         SubscribeChannels();
                         break;
-                    case Parser.ParseResult.Publish:
+                    case Parser.MessageType.Publish:
                         HandlePublish((string) ((JObject) dataobject).GetValue("channel"),
                             ((JObject) dataobject).GetValue("data"));
 //                        Console.WriteLine("Publish got called");
                         break;
-                    case Parser.ParseResult.Removetoken:
+                    case Parser.MessageType.Removetoken:
                         SetAuthToken(null);
 //                        Console.WriteLine("Removetoken got called");
                         break;
-                    case Parser.ParseResult.Settoken:
+                    case Parser.MessageType.Settoken:
                         _listener.OnSetAuthToken((string) ((JObject) dataobject).GetValue("token"), this);
 //                        Console.WriteLine("Set token got called");
                         break;
-                    case Parser.ParseResult.Event:
+                    case Parser.MessageType.Event:
 
                         if (HasEventAck(Event))
                         {
@@ -176,7 +176,7 @@ namespace ScClient
                         }
 
                         break;
-                    case Parser.ParseResult.Ackreceive:
+                    case Parser.MessageType.Ackreceive:
 
 //                        Console.WriteLine("Ack receive got called");
                         if (acks.ContainsKey(rid))

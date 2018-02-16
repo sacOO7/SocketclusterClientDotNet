@@ -4,20 +4,20 @@
     <TargetFrameworks>netcoreapp1.0;netcoreapp1.1;netcoreapp2.0;netstandard1.3;netstandard1.6;netstandard2.0;net45;net46;net40</TargetFrameworks>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-    <Authors>Sachin Shinde (https://github.com/sacOO7/)</Authors>
+    <Authors>Sachin Shinde [https://github.com/sacOO7]</Authors>
     <RepositoryUrl>https://github.com/sacOO7/SocketclusterClientDotNet</RepositoryUrl>
     <RepositoryType>Dotnet</RepositoryType>
     <PackageReleaseNotes>Build target defined for dotnetcore, dotnet4.* and dotnetstandard</PackageReleaseNotes>
     <Description>C# client implementation for socketcluster framework in node.js</Description>
     <PackageProjectUrl>https://github.com/sacOO7/SocketclusterClientDotNet</PackageProjectUrl>
-    <PackageIconUrl>https://socketcluster.io/assets/img/logo.png</PackageIconUrl>
-    <Company>Socketcluster (https://socketcluster.io/#!/)</Company>
+    <PackageIconUrl>https://raw.github.com/SocketCluster/socketcluster/master/assets/logo.png</PackageIconUrl>
+    <Company>Socketcluster [https://socketcluster.io/#!/]</Company>
     <Product>Socketcluster Client DotNet</Product>
-    <Version>1.1.0</Version>
+    <Version>1.1.1</Version>
     <PackageId>ScClient.Official</PackageId>
     <PackageLicenseUrl>https://github.com/sacOO7/SocketclusterClientDotNet/blob/master/LICENSE.txt</PackageLicenseUrl>
     <Copyright>https://github.com/sacOO7/SocketclusterClientDotNet/blob/master/LICENSE.txt</Copyright>
-    <PackageTags>websocket client socketcluster DotNet</PackageTags>
+    <PackageTags>c# websocket client socketcluster realtime</PackageTags>
     <title>Socketcluster Client DotNet (Official)</title>
    </PropertyGroup>
 

@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using SuperSocket.ClientEngine;
+using System;
 using System.Threading;
-using SuperSocket.ClientEngine;
 
-
-namespace ScClient
+namespace ScClient.Examples
 {
     internal class Program : IBasicListener
     {
@@ -27,6 +25,7 @@ namespace ScClient
         public void OnConnectError(Socket socket, ErrorEventArgs e)
         {
             Console.WriteLine("on connect error got called");
+
         }
 
         public void OnAuthentication(Socket socket, bool status)

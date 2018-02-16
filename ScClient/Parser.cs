@@ -4,7 +4,7 @@ namespace ScClient
 {
     public class Parser
     {
-        public enum ParseResult
+        public enum MessageType
         {
             Isauthenticated,
             Publish,
@@ -14,19 +14,19 @@ namespace ScClient
             Ackreceive
         }
 
-        public static ParseResult Parse(object dataobject, long? rid, long? cid, string Event)
+        public static MessageType Parse(object dataobject, long? rid, long? cid, string Event)
         {
-            if (Event == null) return rid == 1 ? ParseResult.Isauthenticated : ParseResult.Ackreceive;
+            if (Event == null) return rid == 1 ? MessageType.Isauthenticated : MessageType.Ackreceive;
             switch (Event)
             {
                 case "#publish":
-                    return ParseResult.Publish;
+                    return MessageType.Publish;
                 case "#removeAuthToken":
-                    return ParseResult.Removetoken;
+                    return MessageType.Removetoken;
                 case "#setAuthToken":
-                    return ParseResult.Settoken;
+                    return MessageType.Settoken;
                 default:
-                    return ParseResult.Event;
+                    return MessageType.Event;
             }
         }
     }
