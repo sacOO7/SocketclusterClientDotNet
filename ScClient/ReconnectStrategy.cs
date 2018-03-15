@@ -1,6 +1,6 @@
 ﻿namespace ScClient
 {
-    public class ReconnectStrategy
+    public class ReconnectStrategy : IReconnectStrategy
     {
         /**
      *The number of milliseconds to delay before attempting to reconnect.
@@ -33,7 +33,7 @@
             _attmptsMade = 0;
         }
 
-        public ReconnectStrategy SetMaxAttempts(int attempts)
+        public IReconnectStrategy SetMaxAttempts(int attempts)
         {
             _maxAttempts = attempts;
             return this;

@@ -19,7 +19,7 @@ namespace ScClient
         private long _counter;
         private string _authToken;
         private List<Channel> _channels;
-        private ReconnectStrategy _strategy;
+        private IReconnectStrategy _strategy;
         private Dictionary<long?, object[]> acks;
         private IBasicListener _listener;
 
@@ -39,7 +39,7 @@ namespace ScClient
             _socket.DataReceived += new EventHandler<DataReceivedEventArgs>(OnWebsocketDataReceived);
         }
 
-        public void SetReconnectStrategy(ReconnectStrategy strategy)
+        public void SetReconnectStrategy(IReconnectStrategy strategy)
         {
             _strategy = strategy;
         }
