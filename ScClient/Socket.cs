@@ -215,6 +215,10 @@ namespace ScClient
 
         public void Connect()
         {
+            if (_socket.State == WebSocketState.Connecting || _socket.State == WebSocketState.Open)
+            {
+                return;
+            }
             _socket.Open();
         }
 
