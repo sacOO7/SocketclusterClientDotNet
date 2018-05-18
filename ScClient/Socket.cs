@@ -217,6 +217,7 @@ namespace ScClient
         {
             if (_socket.State == WebSocketState.Connecting || _socket.State == WebSocketState.Open)
             {
+                Console.WriteLine("Socket already connected");
                 return;
             }
             _socket.Open();
