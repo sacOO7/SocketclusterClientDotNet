@@ -1,4 +1,5 @@
 ﻿using System;
+using ScClient.Models;
 
 namespace ScClient
 {
@@ -14,10 +15,10 @@ namespace ScClient
             Ackreceive
         }
 
-        public static MessageType Parse(object dataobject, long? rid, long? cid, string Event)
+        public static MessageType Parse(MessageEvent messageEvent)
         {
-            if (Event == null) return rid == 1 ? MessageType.Isauthenticated : MessageType.Ackreceive;
-            switch (Event)
+            if (messageEvent.Event == null) return messageEvent.Rid == 1 ? MessageType.Isauthenticated : MessageType.Ackreceive;
+            switch (messageEvent.Event)
             {
                 case "#publish":
                     return MessageType.Publish;

@@ -2,10 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Resources;
 using System.Threading;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+using ScClient.Models;
 using SuperSocket.ClientEngine;
 using SuperSocket.ClientEngine.Proxy;
 using WebSocket4Net;
@@ -14,16 +12,17 @@ namespace ScClient
 {
     public class Socket : Emitter
     {
-        public WebSocket _socket;
-        public string id;
+        private readonly WebSocket _socket;
+        private string _id;
         private long _counter;
         private string _authToken;
-        private List<Channel> _channels;
+        private readonly List<Channel> _channels;
         private IReconnectStrategy _strategy;
-        private Dictionary<long?, object[]> acks;
+        private readonly Dictionary<long?, object[]> acks;
         private IBasicListener _listener;
+        private IJsonConverter _jsonConverter;
 
-        public Socket(string url)
+        public Socket(string url, IJsonConverter jsonConverter = null)
         {
             _socket = new WebSocket(url);
             _counter = 0;
@@ -37,6 +36,7 @@ namespace ScClient
             _socket.Closed += new EventHandler(OnWebsocketClosed);
             _socket.MessageReceived += new EventHandler<MessageReceivedEventArgs>(OnWebsocketMessageReceived);
             _socket.DataReceived += new EventHandler<DataReceivedEventArgs>(OnWebsocketDataReceived);
+            _jsonConverter = jsonConverter ?? new NewtonSoftJsonConverter();
         }
 
         public void SetReconnectStrategy(IReconnectStrategy strategy)
@@ -96,13 +96,8 @@ namespace ScClient
             _counter = 0;
             _strategy?.SetAttemptsMade(0);
 
-            var authobject = new Dictionary<string, object>
-            {
-                {"event", "#handshake"},
-                {"data", new Dictionary<string, object> {{"authToken", _authToken}}},
-                {"cid", Interlocked.Increment(ref _counter)}
-            };
-            var json = JsonConvert.SerializeObject(authobject, Formatting.Indented);
+            var authObject = EventFactory.GetHandshakeEventObject(_authToken, Interlocked.Increment(ref _counter));
+            var json = _jsonConverter.Serialize(authObject);
 
             ((WebSocket) sender).Send(json);
 
@@ -131,65 +126,54 @@ namespace ScClient
             }
             else
             {
-//                Console.WriteLine("Message received :: "+e.Message);
+                Console.WriteLine("Message received :: "+e.Message);
 
-                var dict = JsonConvert.DeserializeObject<Dictionary<string, object>>(e.Message);
+                var messageEvent = _jsonConverter.Deserialize<MessageEvent>(e.Message);
 
-                var dataobject = dict.GetValue<object>("data", null);
-                var rid = dict.GetValue<long?>("rid", null);
-                var cid = dict.GetValue<long?>("cid", null);
-                var Event = dict.GetValue<string>("event", null);
-
-//                Console.WriteLine("data is "+e.Message);
-//                Console.WriteLine("data is "+dataobject +" rid is "+rid+" cid is "+cid+" event is "+Event);
-
-                switch (Parser.Parse(dataobject, rid, cid, Event))
+                AuthEvent authEvent;
+                switch (Parser.Parse(messageEvent))
                 {
                     case Parser.MessageType.Isauthenticated:
-//                        Console.WriteLine("IS authenticated got called");
-                        id = (string) ((JObject) dataobject).GetValue("id");
-                        _listener.OnAuthentication(this, (bool) ((JObject) dataobject).GetValue("isAuthenticated"));
+                        authEvent = _jsonConverter.Deserialize<AuthEvent>(_jsonConverter.Serialize(messageEvent.Data));
+                        _id = authEvent.Id;
+                        _listener.OnAuthentication(this, authEvent.IsAuthenticated);
                         SubscribeChannels();
                         break;
                     case Parser.MessageType.Publish:
-                        HandlePublish((string) ((JObject) dataobject).GetValue("channel"),
-                            ((JObject) dataobject).GetValue("data"));
-//                        Console.WriteLine("Publish got called");
+                        var channelEvent = _jsonConverter.Deserialize<ChannelEvent>(_jsonConverter.Serialize(messageEvent.Data));
+                        HandlePublish(channelEvent.Channel, channelEvent.Data);
                         break;
                     case Parser.MessageType.Removetoken:
                         SetAuthToken(null);
-//                        Console.WriteLine("Removetoken got called");
                         break;
                     case Parser.MessageType.Settoken:
-                        _listener.OnSetAuthToken((string) ((JObject) dataobject).GetValue("token"), this);
-//                        Console.WriteLine("Set token got called");
+                        authEvent = _jsonConverter.Deserialize<AuthEvent>(_jsonConverter.Serialize(messageEvent.Data));
+                        _listener.OnSetAuthToken(authEvent.Token, this);
                         break;
                     case Parser.MessageType.Event:
 
-                        if (HasEventAck(Event))
+                        if (HasEventAck(messageEvent.Event))
                         {
-                            HandleEmitAck(Event, dataobject, Ack(cid));
+                            HandleEmitAck(messageEvent.Event, messageEvent.Data, Ack(messageEvent.Cid.Value));
                         }
                         else
                         {
-                            HandleEmit(Event, dataobject);
+                            HandleEmit(messageEvent.Event, messageEvent.Data);
                         }
 
                         break;
                     case Parser.MessageType.Ackreceive:
-
-//                        Console.WriteLine("Ack receive got called");
-                        if (acks.ContainsKey(rid))
+                        if (acks.ContainsKey(messageEvent.Rid))
                         {
-                            var Object = acks[rid];
-                            acks.Remove(rid);
+                            var Object = acks[messageEvent.Rid];
+                            acks.Remove(messageEvent.Rid);
                             if (Object != null)
                             {
                                 var fn = (Ackcall) Object[1];
                                 if (fn != null)
                                 {
-                                    fn((string) Object[0], dict.GetValue<object>("error", null),
-                                        dict.GetValue<object>("data", null));
+                                    fn((string) Object[0], messageEvent.Error,
+                                        messageEvent.Data);
                                 }
                                 else
                                 {
@@ -203,8 +187,6 @@ namespace ScClient
                         throw new ArgumentOutOfRangeException();
                 }
             }
-
-//            _socket.Send("Hello World!");
         }
 
 
@@ -230,48 +212,41 @@ namespace ScClient
             _socket.Close();
         }
 
-        private Ackcall Ack(long? cid)
+        private Ackcall Ack(long cid)
         {
             return (name, error, data) =>
             {
-                Dictionary<string, object> dataObject =
-                    new Dictionary<string, object> {{"error", error}, {"data", data}, {"rid", cid}};
-                var json = JsonConvert.SerializeObject(dataObject, Formatting.Indented);
+                var dataObject = EventFactory.GetReceiveEventObject(data, error, cid);
+                var json = _jsonConverter.Serialize(dataObject);
                 _socket.Send(json);
             };
         }
 
 
-        public Socket Emit(string Event, object Object)
+        public Socket Emit(string @event, object data)
         {
-//            Console.WriteLine("Emit got called");
-            Dictionary<string, object>
-                eventObject = new Dictionary<string, object> {{"event", Event}, {"data", Object}};
-            var json = JsonConvert.SerializeObject(eventObject, Formatting.Indented);
+            long count = Interlocked.Increment(ref _counter);
+            var eventObject = EventFactory.GetEmitEventObject(@event, data, count);
+            var json = _jsonConverter.Serialize(eventObject);
             _socket.Send(json);
             return this;
         }
 
-        public Socket Emit(string Event, object Object, Ackcall ack)
+        public Socket Emit(string @event, object data, Ackcall ack)
         {
             long count = Interlocked.Increment(ref _counter);
-            Dictionary<string, object> eventObject =
-                new Dictionary<string, object> {{"event", Event}, {"data", Object}, {"cid", count}};
-            acks.Add(count, GetAckObject(Event, ack));
-            var json = JsonConvert.SerializeObject(eventObject, Formatting.Indented);
+            var eventObject = EventFactory.GetEmitEventObject(@event, data, count);
+            acks.Add(count, GetAckObject(@event, ack));
+            var json = _jsonConverter.Serialize(eventObject);
             _socket.Send(json);
             return this;
         }
 
         public Socket Subscribe(string channel)
         {
-            Dictionary<string, object> subscribeObject = new Dictionary<string, object>
-            {
-                {"event", "#subscribe"},
-                {"data", new Dictionary<string, string> {{"channel", channel}}},
-                {"cid", Interlocked.Increment(ref _counter)}
-            };
-            var json = JsonConvert.SerializeObject(subscribeObject, Formatting.Indented);
+            long count = Interlocked.Increment(ref _counter);
+            var subscribeObject = EventFactory.GetSubscribeEventObject(channel, count);
+            var json = _jsonConverter.Serialize(subscribeObject);
             _socket.Send(json);
             return this;
         }
@@ -279,27 +254,18 @@ namespace ScClient
         public Socket Subscribe(string channel, Ackcall ack)
         {
             long count = Interlocked.Increment(ref _counter);
-            Dictionary<string, object> subscribeObject = new Dictionary<string, object>
-            {
-                {"event", "#subscribe"},
-                {"data", new Dictionary<string, string>() {{"channel", channel}}},
-                {"cid", count}
-            };
+            var subscribeObject = EventFactory.GetSubscribeEventObject(channel, count);
             acks.Add(count, GetAckObject(channel, ack));
-            var json = JsonConvert.SerializeObject(subscribeObject, Formatting.Indented);
+            var json = _jsonConverter.Serialize(subscribeObject);
             _socket.Send(json);
             return this;
         }
 
         public Socket Unsubscribe(string channel)
         {
-            Dictionary<string, object> subscribeObject = new Dictionary<string, object>
-            {
-                {"event", "#unsubscribe"},
-                {"data", channel},
-                {"cid", Interlocked.Increment(ref _counter)}
-            };
-            var json = JsonConvert.SerializeObject(subscribeObject, Formatting.Indented);
+            long count = Interlocked.Increment(ref _counter);
+            var subscribeObject = EventFactory.GetUnsubscribeEventObject(channel, count);
+            var json = _jsonConverter.Serialize(subscribeObject);
             _socket.Send(json);
             return this;
         }
@@ -307,23 +273,18 @@ namespace ScClient
         public Socket Unsubscribe(string channel, Ackcall ack)
         {
             long count = Interlocked.Increment(ref _counter);
-            Dictionary<string, object> subscribeObject =
-                new Dictionary<string, object> {{"event", "#unsubscribe"}, {"data", channel}, {"cid", count}};
+            var subscribeObject = EventFactory.GetUnsubscribeEventObject(channel, count);
             acks.Add(count, GetAckObject(channel, ack));
-            var json = JsonConvert.SerializeObject(subscribeObject, Formatting.Indented);
+            var json = _jsonConverter.Serialize(subscribeObject);
             _socket.Send(json);
             return this;
         }
 
         public Socket Publish(string channel, object data)
         {
-            Dictionary<string, object> publishObject = new Dictionary<string, object>
-            {
-                {"event", "#publish"},
-                {"data", new Dictionary<string, object> {{"channel", channel}, {"data", data}}},
-                {"cid", Interlocked.Increment(ref _counter)}
-            };
-            var json = JsonConvert.SerializeObject(publishObject, Formatting.Indented);
+            long count = Interlocked.Increment(ref _counter);
+            var publishObject = EventFactory.GetPublishEventObject(channel, data, count);
+            var json = _jsonConverter.Serialize(publishObject);
             _socket.Send(json);
             return this;
         }
@@ -331,14 +292,9 @@ namespace ScClient
         public Socket Publish(string channel, object data, Ackcall ack)
         {
             long count = Interlocked.Increment(ref _counter);
-            Dictionary<string, object> publishObject = new Dictionary<string, object>
-            {
-                {"event", "#publish"},
-                {"data", new Dictionary<string, object> {{"channel", channel}, {"data", data}}},
-                {"cid", count}
-            };
+            var publishObject = EventFactory.GetPublishEventObject(channel, data, count);
             acks.Add(count, GetAckObject(channel, ack));
-            var json = JsonConvert.SerializeObject(publishObject, Formatting.Indented);
+            var json = _jsonConverter.Serialize(publishObject);
             _socket.Send(json);
             return this;
         }

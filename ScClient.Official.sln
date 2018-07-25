@@ -5,12 +5,14 @@ VisualStudioVersion = 15.0.27130.2027
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ScClient", "ScClient\ScClient.csproj", "{E75DCC5F-F23D-4788-ACCA-C76155842B57}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScClient.Tests", "ScClient.Tests\ScClient.Tests.csproj", "{E8E316E7-8C20-493A-8F52-420F096CBD07}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ScClient.Tests", "ScClient.Tests\ScClient.Tests.csproj", "{E8E316E7-8C20-493A-8F52-420F096CBD07}"
 	ProjectSection(ProjectDependencies) = postProject
 		{E75DCC5F-F23D-4788-ACCA-C76155842B57} = {E75DCC5F-F23D-4788-ACCA-C76155842B57}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScClient.Examples", "ScClient.Example\ScClient.Examples.csproj", "{474C9323-D868-4C28-AB5E-CE3F530E1CF7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ScClient.Examples", "ScClient.Example\ScClient.Examples.csproj", "{474C9323-D868-4C28-AB5E-CE3F530E1CF7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScClient.Unity", "ScClient.Unity\ScClient.Unity.csproj", "{5BBECBE0-88AA-4424-8418-76BA3AC7390F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -30,6 +32,10 @@ Global
 		{474C9323-D868-4C28-AB5E-CE3F530E1CF7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{474C9323-D868-4C28-AB5E-CE3F530E1CF7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{474C9323-D868-4C28-AB5E-CE3F530E1CF7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5BBECBE0-88AA-4424-8418-76BA3AC7390F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5BBECBE0-88AA-4424-8418-76BA3AC7390F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5BBECBE0-88AA-4424-8418-76BA3AC7390F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5BBECBE0-88AA-4424-8418-76BA3AC7390F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
