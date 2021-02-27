@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Resources;
 using System.Threading;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -22,8 +21,10 @@ namespace ScClient
         private IReconnectStrategy _strategy;
         private Dictionary<long?, object[]> acks;
         private IBasicListener _listener;
+        private string _ping = "";
+        private string _pong = "";
 
-        public Socket(string url)
+        public Socket(string url, int protocolVersion = 2)
         {
             _socket = new WebSocket(url);
             _counter = 0;
@@ -37,6 +38,13 @@ namespace ScClient
             _socket.Closed += new EventHandler(OnWebsocketClosed);
             _socket.MessageReceived += new EventHandler<MessageReceivedEventArgs>(OnWebsocketMessageReceived);
             _socket.DataReceived += new EventHandler<DataReceivedEventArgs>(OnWebsocketDataReceived);
+
+            // set ping/pong strings based on protocol version
+            if (protocolVersion == 1)
+            {
+                _ping = "#1";
+                _pong = "#2";
+            }
         }
 
         public void SetReconnectStrategy(IReconnectStrategy strategy)
@@ -125,83 +133,82 @@ namespace ScClient
 
         private void OnWebsocketMessageReceived(object sender, MessageReceivedEventArgs e)
         {
-            if (e.Message == "")
+            if (e.Message == _ping)
             {
-                _socket.Send("");
+                _socket.Send(_pong);
+                return;
             }
-            else
-            {
+
 //                Console.WriteLine("Message received :: "+e.Message);
 
-                var dict = JsonConvert.DeserializeObject<Dictionary<string, object>>(e.Message);
+            var dict = JsonConvert.DeserializeObject<Dictionary<string, object>>(e.Message);
 
-                var dataobject = dict.GetValue<object>("data", null);
-                var rid = dict.GetValue<long?>("rid", null);
-                var cid = dict.GetValue<long?>("cid", null);
-                var Event = dict.GetValue<string>("event", null);
+            var dataobject = dict.GetValue<object>("data", null);
+            var rid = dict.GetValue<long?>("rid", null);
+            var cid = dict.GetValue<long?>("cid", null);
+            var Event = dict.GetValue<string>("event", null);
 
 //                Console.WriteLine("data is "+e.Message);
 //                Console.WriteLine("data is "+dataobject +" rid is "+rid+" cid is "+cid+" event is "+Event);
 
-                switch (Parser.Parse(dataobject, rid, cid, Event))
-                {
-                    case Parser.MessageType.Isauthenticated:
+            switch (Parser.Parse(dataobject, rid, cid, Event))
+            {
+                case Parser.MessageType.Isauthenticated:
 //                        Console.WriteLine("IS authenticated got called");
-                        id = (string) ((JObject) dataobject).GetValue("id");
-                        _listener.OnAuthentication(this, (bool) ((JObject) dataobject).GetValue("isAuthenticated"));
-                        SubscribeChannels();
-                        break;
-                    case Parser.MessageType.Publish:
-                        HandlePublish((string) ((JObject) dataobject).GetValue("channel"),
-                            ((JObject) dataobject).GetValue("data"));
+                    id = (string) ((JObject) dataobject).GetValue("id");
+                    _listener.OnAuthentication(this, (bool) ((JObject) dataobject).GetValue("isAuthenticated"));
+                    SubscribeChannels();
+                    break;
+                case Parser.MessageType.Publish:
+                    HandlePublish((string) ((JObject) dataobject).GetValue("channel"),
+                        ((JObject) dataobject).GetValue("data"));
 //                        Console.WriteLine("Publish got called");
-                        break;
-                    case Parser.MessageType.Removetoken:
-                        SetAuthToken(null);
+                    break;
+                case Parser.MessageType.Removetoken:
+                    SetAuthToken(null);
 //                        Console.WriteLine("Removetoken got called");
-                        break;
-                    case Parser.MessageType.Settoken:
-                        _listener.OnSetAuthToken((string) ((JObject) dataobject).GetValue("token"), this);
+                    break;
+                case Parser.MessageType.Settoken:
+                    _listener.OnSetAuthToken((string) ((JObject) dataobject).GetValue("token"), this);
 //                        Console.WriteLine("Set token got called");
-                        break;
-                    case Parser.MessageType.Event:
+                    break;
+                case Parser.MessageType.Event:
 
-                        if (HasEventAck(Event))
-                        {
-                            HandleEmitAck(Event, dataobject, Ack(cid));
-                        }
-                        else
-                        {
-                            HandleEmit(Event, dataobject);
-                        }
+                    if (HasEventAck(Event))
+                    {
+                        HandleEmitAck(Event, dataobject, Ack(cid));
+                    }
+                    else
+                    {
+                        HandleEmit(Event, dataobject);
+                    }
 
-                        break;
-                    case Parser.MessageType.Ackreceive:
+                    break;
+                case Parser.MessageType.Ackreceive:
 
 //                        Console.WriteLine("Ack receive got called");
-                        if (acks.ContainsKey(rid))
+                    if (acks.ContainsKey(rid))
+                    {
+                        var Object = acks[rid];
+                        acks.Remove(rid);
+                        if (Object != null)
                         {
-                            var Object = acks[rid];
-                            acks.Remove(rid);
-                            if (Object != null)
+                            var fn = (Ackcall) Object[1];
+                            if (fn != null)
                             {
-                                var fn = (Ackcall) Object[1];
-                                if (fn != null)
-                                {
-                                    fn((string) Object[0], dict.GetValue<object>("error", null),
-                                        dict.GetValue<object>("data", null));
-                                }
-                                else
-                                {
-                                    Console.WriteLine("Ack function is null");
-                                }
+                                fn((string) Object[0], dict.GetValue<object>("error", null),
+                                    dict.GetValue<object>("data", null));
+                            }
+                            else
+                            {
+                                Console.WriteLine("Ack function is null");
                             }
                         }
+                    }
 
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException();
-                }
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
             }
 
 //            _socket.Send("Hello World!");
