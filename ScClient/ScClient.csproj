@@ -13,7 +13,7 @@
     <PackageIconUrl></PackageIconUrl>
     <Company>Socketcluster [https://socketcluster.io/#!/]</Company>
     <Product>Socketcluster Client DotNet</Product>
-    <Version>1.2.0</Version>
+    <Version>1.2.1</Version>
     <PackageId>ScClient.Official</PackageId>
     <PackageLicenseUrl></PackageLicenseUrl>
     <Copyright>https://github.com/sacOO7/SocketclusterClientDotNet/blob/master/LICENSE.txt</Copyright>
