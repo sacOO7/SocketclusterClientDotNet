@@ -66,26 +66,38 @@ namespace ScClient
 
         public Channel CreateChannel(string name)
         {
-            var channel = new Channel(this, name);
-            _channels.Add(channel);
-            return channel;
+            lock (_channels)
+            {
+                var channel = new Channel(this, name);
+                _channels.Add(channel);
+                return channel;
+            }
         }
 
         public List<Channel> GetChannels()
         {
-            return _channels;
+            lock (_channels)
+            {
+                return _channels;
+            }
         }
 
         public Channel GetChannelByName(string name)
         {
-            return _channels.FirstOrDefault(channel => channel.GetChannelName().Equals(name));
+            lock (_channels)
+            {
+                return _channels.FirstOrDefault(channel => channel.GetChannelName().Equals(name));
+            }
         }
 
         private void SubscribeChannels()
         {
-            foreach (var channel in _channels)
+            lock (_channels)
             {
-                channel.Subscribe();
+                foreach (var channel in _channels)
+                {
+                    channel.Subscribe();
+                }
             }
         }
 
@@ -127,7 +139,7 @@ namespace ScClient
             _listener.OnDisconnected(this);
             if (!_strategy.AreAttemptsComplete())
             {
-                new Thread(Reconnect).Start();
+                new Thread(ReconnectThread).Start();
             }
         }
 
@@ -230,11 +242,20 @@ namespace ScClient
             _socket.Open();
         }
 
-        private void Reconnect()
+        private void ReconnectThread()
         {
-            _strategy.ProcessValues();
-            Thread.Sleep(_strategy.GetReconnectInterval());
-            Connect();
+            // Catch any exception, we can't have a thread that we have no control over
+            //  crashing our applications
+            try
+            {
+                _strategy.ProcessValues();
+                Thread.Sleep(_strategy.GetReconnectInterval());
+                Connect();
+            }
+            catch (Exception ex)
+            {
+                //System.Diagnostics.Trace.WriteLine(ex);
+            }
         }
 
         public void Disconnect()
@@ -402,14 +423,20 @@ namespace ScClient
 
             public void Unsubscribe()
             {
-                _socket.Unsubscribe(_channelname);
-                _socket._channels.Remove(this);
+                lock (_socket._channels)
+                {
+                    _socket.Unsubscribe(_channelname);
+                    _socket._channels.Remove(this);
+                }
             }
 
             public void Unsubscribe(Ackcall ack)
             {
-                _socket.Unsubscribe(_channelname, ack);
-                _socket._channels.Remove(this);
+                lock (_socket._channels)
+                {
+                    _socket.Unsubscribe(_channelname, ack);
+                    _socket._channels.Remove(this);
+                }
             }
 
             public string GetChannelName()
